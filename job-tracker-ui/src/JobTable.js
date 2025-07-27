@@ -5,7 +5,8 @@ export default function JobTable({ refresh }) {
   const [jobs, setJobs] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:8000/applications").then(res => setJobs(res.data));
+  
+    axios.get(`${process.env.REACT_APP_API_BASE_URL}/applications`).then(res => setJobs(res.data));
   }, [refresh]);
 
   return (

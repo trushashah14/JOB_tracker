@@ -24,7 +24,7 @@ dist/
 .env.production.local
 *.bak
 *.swp
-
+.env
 
 npm-debug.log*
 yarn-debug.log*
