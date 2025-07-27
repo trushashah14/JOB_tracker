@@ -11,7 +11,7 @@ export default function JobForm({ onAdd }) {
     setError(""); // Clear previous errors
 
     try {
-      await axios.post("http://localhost:8000/applications", { company, role });
+      await axios.post(`${process.env.REACT_APP_API_BASE_URL}/applications`, { company, role });
       onAdd(); // refresh list
       setCompany("");
       setRole("");
