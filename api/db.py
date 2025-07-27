@@ -1,24 +1,31 @@
-from tinydb import TinyDB, Query
+from sqlmodel import SQLModel, Field, create_engine, Session, select
 from datetime import datetime
 
-db = TinyDB("applications.json")
-Job = Query()
+class JobApplication(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    company: str
+    role: str
+    status: str = "Waiting"
+    date_applied: str = datetime.today().strftime("%Y-%m-%d")
+    last_updated: str = datetime.today().strftime("%Y-%m-%d")
 
-def application_exists(company, role):
-    return db.search((Job.company == company) & (Job.role == role))
-
+engine = create_engine("sqlite:///applications.db")
 
 def add_application(app_data):
-    if application_exists(app_data["company"], app_data["role"]):
-        return None  # Signals duplicate
-
-    entry = {
-        **app_data,
-        "status": "Waiting",
-        "date_applied": datetime.today().strftime("%Y-%m-%d"),
-        "last_updated": datetime.today().strftime("%Y-%m-%d")
-    }
-    return db.insert(entry)
+    with Session(engine) as session:
+        existing = session.exec(
+            select(JobApplication).where(
+                JobApplication.company == app_data["company"],
+                JobApplication.role == app_data["role"]
+            )
+        ).first()
+        if existing:
+            return None
+        app = JobApplication(**app_data)
+        session.add(app)
+        session.commit()
+        return app.id
 
 def get_all_applications():
-    return db.all()
+    with Session(engine) as session:
+        return session.exec(select(JobApplication)).all()

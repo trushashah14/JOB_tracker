@@ -1,6 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from models import JobApplication
-from db import add_application, get_all_applications
+from sqlmodel import SQLModel
+
+from db import add_application, get_all_applications , engine
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -10,13 +12,17 @@ app = FastAPI()
 # Allow frontend origin
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000","https://your-vercel-frontend.vercel.app"
+    allow_origins=["http://localhost:3000","https://job-tracker-mv96kmutk-trushashah14s-projects.vercel.app"
 ],  # 👈 your React app
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# Create tables on app startup
+@app.on_event("startup")
+def on_startup():
+    SQLModel.metadata.create_all(engine)
 
 @app.post("/applications")
 def create_application(app: JobApplication):
