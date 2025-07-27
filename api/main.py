@@ -12,7 +12,7 @@ app = FastAPI()
 # Allow frontend origin
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000","https://job-tracker-ebon-gamma.vercel.app/"
+    allow_origins=["http://localhost:3000","https://job-tracker-ebon-gamma.vercel.app"
 ],  # 👈 your React app
     allow_credentials=True,
     allow_methods=["*"],
