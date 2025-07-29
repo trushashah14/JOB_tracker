@@ -8,6 +8,7 @@ export default function App() {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleLogin = (id, userEmail, name) => {
     setUserId(id);
@@ -15,7 +16,11 @@ export default function App() {
     setUsername(name);
   };
 
-  const triggerRefresh = () => setRefreshKey((prev) => prev + 1);
+  const triggerRefresh = () => {
+    setIsRefreshing(true);
+    setRefreshKey((prev) => prev + 1);
+    setTimeout(() => setIsRefreshing(false), 600);
+  };
 
   if (!userId) {
     return (
@@ -44,6 +49,21 @@ export default function App() {
         Welcome, {username} to your Job Tracker👋
       </h1>
       <JobForm onAdd={triggerRefresh} userId={userId} />
+      {/* Refresh Button */}
+       <div className="flex justify-center mb-6 mt-4">
+  <button
+    onClick={triggerRefresh}
+    className={`inline-flex items-center bg-orange-400 hover:bg-orange-500 text-white font-semibold text-sm py-2 px-4 rounded-2xl shadow transition duration-150 ${
+      isRefreshing ? "bg-orange-300" : ""
+    }`}
+    disabled={isRefreshing}
+  >
+    <span className="mr-2 text-white text-lg font-bold">↻</span>
+    Refresh List
+  </button>
+</div>
+
+
       <JobTable refresh={refreshKey} userId={userId} />
     </div>
   );

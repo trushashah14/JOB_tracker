@@ -1,3 +1,4 @@
+from typing import Optional
 from sqlmodel import SQLModel, Field, create_engine, Session, select
 from datetime import datetime
 from passlib.context import CryptContext
@@ -30,6 +31,7 @@ class JobApplication(SQLModel, table=True):
     status: str = "Waiting"
     date_applied: str = datetime.today().strftime("%Y-%m-%d")
     last_updated: str = datetime.today().strftime("%Y-%m-%d")
+    ghosted_date: Optional[str] = None
 
 engine = create_engine("sqlite:///applications.db")
 

@@ -1,11 +1,11 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Body
 from models import JobApplicationCreate
 from sqlmodel import SQLModel,Session,select 
 from models import UserCreate, UserLogin ,  PasswordReset # Pydantic request models
 from auth import register_user, login_user
 from db import add_application, get_applications_by_user , engine ,pwd_context,JobApplication , User
-
 from fastapi.middleware.cors import CORSMiddleware
+from datetime import datetime
 
 
 
@@ -90,3 +90,21 @@ def delete_application(app_id: int):
         session.delete(app)
         session.commit()
         return {"message": f"Application {app_id} deleted."}
+
+@app.patch("/applications/{app_id}")
+def update_application(app_id: int, data: dict = Body(...)):
+    with Session(engine) as session:
+        app = session.get(JobApplication, app_id)
+        if not app:
+            raise HTTPException(status_code=404, detail="Application not found.")
+
+        # Update any fields provided in the payload
+        for key, value in data.items():
+            if hasattr(app, key):
+                setattr(app, key, value)
+
+        app.last_updated = datetime.today().strftime("%Y-%m-%d")
+        session.add(app)
+        session.commit()
+        session.refresh(app)
+        return {"message": f"Application {app_id} updated.", "status": app.status}
